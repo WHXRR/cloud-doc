@@ -1,0 +1,30 @@
+.file-list {
+  overflow: hidden;
+}
+.file-item {
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s;
+  &:hover {
+    background-color: #f2f3f5;
+  }
+  .file-icon {
+    margin-right: 10px;
+  }
+  .options-icon {
+    gap: 10px;
+    margin-left: 20px;
+  }
+  .h-33 {
+    height: 33px;
+    line-height: 33px;
+  }
+  .file-name {
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+}
+.is-active {
+  color: #fff;
+  background-color: #0d6efd !important;
+}
