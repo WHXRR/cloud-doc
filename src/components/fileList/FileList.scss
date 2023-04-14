@@ -1,5 +1,6 @@
 .file-list {
   overflow: hidden;
+  overflow-y: auto;
 }
 .file-item {
   border: none;
@@ -26,5 +27,5 @@
 }
 .is-active {
   color: #fff;
-  background-color: #0d6efd !important;
+  background-color: #000000 !important;
 }

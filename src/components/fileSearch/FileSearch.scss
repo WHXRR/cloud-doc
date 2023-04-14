@@ -1,9 +1,12 @@
+.file-list {
+  height: calc(100vh - 95px);
+}
 .title-h {
   height: 61px;
 }
 .unselect {
   -webkit-user-select: none;
-  -moz-user-select:none;
-  -o-user-select:none;
-  -ms-user-select:none; 
+  -moz-user-select: none;
+  -o-user-select: none;
+  -ms-user-select: none;
 }

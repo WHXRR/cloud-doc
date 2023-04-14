@@ -1,0 +1,37 @@
+html {
+  font-size: 14px;
+  overflow-y: hidden;
+}
+.pointer {
+  cursor: pointer;
+}
+.form-control:focus {
+  border-color: #000 !important;
+  box-shadow: 0 0 0 0.25rem rgba(0, 0, 0, 0.25) !important;
+}
+.right-container {
+  display: flex;
+  flex-direction: column;
+}
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track-piece {
+  background-color: transparent;
+  -webkit-border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:vertical {
+  height: 6px;
+  background-color: #d0d0d0;
+  -webkit-border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:horizontal {
+  width: 6px;
+  background-color: #d0d0d0;
+  -webkit-border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:vertical:hover,
+::-webkit-scrollbar-thumb:horizontal:hover {
+  background-color: #d0d0d0;
+}

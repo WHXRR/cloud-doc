@@ -1,0 +1,44 @@
+.nav {
+  flex-wrap: nowrap;
+  overflow: hidden;
+  word-break: keep-all;
+  overflow-x: auto;
+}
+.mr-10 {
+  margin-right: 10px;
+}
+.nav-link.active {
+  background-color: #000 !important;
+}
+.nav-link {
+  color: #000;
+}
+.nav-link:focus,
+.nav-link:hover {
+  color: #fff !important;
+  background-color: #000 !important;
+}
+.close-icon {
+  visibility: hidden;
+}
+.active .close-icon {
+  visibility: visible;
+}
+.nav-link:hover .close-icon {
+  visibility: visible;
+}
+.un-save-icon {
+  display: none;
+}
+.withUnSaved .un-save-icon {
+  display: block;
+}
+.withUnSaved .close-icon {
+  display: none;
+}
+.withUnSaved:hover .un-save-icon {
+  display: none;
+}
+.withUnSaved:hover .close-icon {
+  display: block;
+}

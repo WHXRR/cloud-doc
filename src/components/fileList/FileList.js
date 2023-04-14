@@ -4,7 +4,7 @@ import useKeyPress from '../../hooks/useKeyPress'
 import './FileList.scss'
 
 const FileList = ({ files, onFileClick, onSaveEdit, onFileDelete }) => {
-  const [isSelected, setIsSelected] = useState(1)
+  const [isSelected, setIsSelected] = useState(0)
   const handleClick = (data) => {
     setIsSelected(data.id)
     onFileClick(data)
@@ -85,7 +85,10 @@ const FileList = ({ files, onFileClick, onSaveEdit, onFileDelete }) => {
                         onBlur={handleCancel} />
                     </div>
                   ) : (
-                    <div className="flex-grow-1 h-33 file-name">
+                    <div
+                      className="flex-grow-1 h-33 file-name"
+                      title={file.name}
+                    >
                       {file.name}
                     </div>
                   )

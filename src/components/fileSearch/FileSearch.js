@@ -30,7 +30,7 @@ const FileSearch = ({ title, onFileSearch }) => {
   })
 
   return (
-    <div className="alert alert-primary title-h d-flex align-items-center pointer mb-0 rounded-0">
+    <div className="alert title-h d-flex align-items-center pointer mb-0 rounded-0">
       {
         !inputActive &&
         <div className="d-flex align-items-center fs-6 justify-content-between flex-grow-1">
@@ -43,7 +43,7 @@ const FileSearch = ({ title, onFileSearch }) => {
       }
       {
         inputActive &&
-        <div className="d-flex gap-3 align-items-center fs-6 justify-content-between">
+        <div className="d-flex gap-3 align-items-center fs-6 justify-content-between flex-grow-1">
           <input ref={inputRef} className="form-control" value={value} onChange={(e) => setValue(e.target.value)} />
           <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" className="bi bi-x-circle" viewBox="0 0 16 16" onClick={closeInput}>
             <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
