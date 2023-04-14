@@ -3,18 +3,12 @@ import PropTypes from 'prop-types'
 import useKeyPress from '../../hooks/useKeyPress'
 import './FileList.scss'
 
-const FileList = ({ files, onFileClick, onSaveEdit, onFileDelete }) => {
-  const [isSelected, setIsSelected] = useState(0)
-  const handleClick = (data) => {
-    setIsSelected(data.id)
-    onFileClick(data)
-  }
+const FileList = ({ files, onFileClick, onSaveEdit, onFileDelete, activeId }) => {
 
   const [isEdit, setIsEdit] = useState('')
   const [value, setValue] = useState('')
   const handleEdit = (e, data) => {
     e.stopPropagation();
-    setIsSelected(data.id)
     setIsEdit(data.id)
     setValue(data.name)
   }
@@ -63,9 +57,9 @@ const FileList = ({ files, onFileClick, onSaveEdit, onFileDelete }) => {
         {
           files.map(file => (
             <li
-              className={`list-group-item file-item ${file.id === isSelected ? 'is-active' : ''}`}
+              className={`list-group-item file-item ${file.id === activeId ? 'is-active' : ''}`}
               key={file.id}
-              onClick={() => handleClick(file)}
+              onClick={() => onFileClick(file)}
             >
               <div className="d-flex align-items-center">
                 <div className="file-icon">
@@ -142,6 +136,7 @@ const FileList = ({ files, onFileClick, onSaveEdit, onFileDelete }) => {
 
 FileList.propTypes = {
   files: PropTypes.array,
+  activeId: PropTypes.number,
   onFileClick: PropTypes.func,
   onSaveEdit: PropTypes.func,
   onFileDelete: PropTypes.func

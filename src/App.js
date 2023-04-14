@@ -22,12 +22,6 @@ function App() {
     setActiveFileId(data.id)
     if (openedFileIds.includes(data.id)) return
     setOpenedFileIds([...openedFileIds, data.id])
-    // const openedFileSet = new Set()
-    // openedFileIds.forEach(item => {
-    //   openedFileSet.add(item)
-    // })
-    // openedFileSet.add(data.id)
-    // setOpenedFileIds([...openedFileSet])
   }
   const onFileDelete = data => {
     console.log(data, 'delete');
@@ -45,9 +39,21 @@ function App() {
     arr.splice(index, 1)
     setOpenedFileIds([...arr])
   }
+  useEffect(() => {
+    if (openedFileIds.includes(activeFileId)) return
+    setActiveFileId(openedFileIds[0])
+  }, [openedFileIds])
 
   const changeEditor = data => {
-    console.log(data, 'editor');
+    const newFile = files.map(item => {
+      if (item.id === activeFileId) {
+        item.body = data
+      }
+      return item
+    })
+    setFiles(newFile)
+    if (unSavedIds.includes(activeFileId)) return
+    setUnSavedIds([...unSavedIds, activeFileId])
   }
   return (
     <div className="App container-fluid px-0">
@@ -56,6 +62,7 @@ function App() {
           <FileSearch onFileSearch={(val) => console.log(val)} />
           <FileList
             files={files}
+            activeId={activeFileId}
             onFileClick={onFileClick}
             onFileDelete={onFileDelete}
             onSaveEdit={onSaveEdit} />
