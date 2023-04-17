@@ -4,7 +4,6 @@ import classNames from 'classnames'
 import "./TabList.scss"
 
 const TabList = ({ files, activeId, unSaveId, onTabClick, onCloseTab }) => {
-
   const handleTabClick = (e, data) => {
     e.preventDefault();
     onTabClick(data)

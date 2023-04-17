@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import useKeyPress from '../../hooks/useKeyPress'
 import './FileSearch.scss'
 
-const FileSearch = ({ title, onFileSearch }) => {
+const FileSearch = ({ title, onFileSearch, onCloseInput }) => {
   const [inputActive, setInputAction] = useState(false)
   const [value, setValue] = useState('')
   const inputRef = useRef(null)
@@ -17,6 +17,7 @@ const FileSearch = ({ title, onFileSearch }) => {
   const closeInput = () => {
     setInputAction(false)
     setValue('')
+    onCloseInput()
   }
 
   const isEnterPress = useKeyPress(13)
@@ -27,7 +28,7 @@ const FileSearch = ({ title, onFileSearch }) => {
     } else if (isEscPress && inputActive) {
       closeInput()
     }
-  })
+  }, [inputActive, isEnterPress, isEscPress])
 
   return (
     <div className="alert title-h d-flex align-items-center pointer mb-0 rounded-0">

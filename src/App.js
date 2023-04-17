@@ -16,7 +16,30 @@ function App() {
   const [openedFileIds, setOpenedFileIds] = useState([])
   const [unSavedIds, setUnSavedIds] = useState([])
 
-  const openedFiles = openedFileIds.map(item => files.find(ele => ele.id === item))
+  const handleUpdate = (id, content, target) => {
+    return files.map(file => {
+      if (file.id === id) {
+        file[target] = content
+      }
+      return file
+    })
+  }
+
+  // search 
+  const [searchFiles, setSearchFiles] = useState([])
+  const onFileSearch = val => {
+    const newFiles = files.filter(file => file.name.includes(val))
+    setSearchFiles(newFiles)
+  }
+  useEffect(() => {
+    onFileSearch()
+  }, [files])
+  const onCloseInput = () => {
+    setSearchFiles([])
+  }
+
+  // fileList 
+  const openedFiles = openedFileIds.map(item => files.find(ele => ele.id === item)).filter(Boolean)
   const activeFile = files.find(item => item.id === activeFileId)
   const onFileClick = data => {
     setActiveFileId(data.id)
@@ -24,12 +47,19 @@ function App() {
     setOpenedFileIds([...openedFileIds, data.id])
   }
   const onFileDelete = data => {
-    console.log(data, 'delete');
+    const newFile = files.filter(file => file.id !== data.id)
+    setFiles(newFile)
+    if (openedFileIds.includes(data.id)) {
+      const newOpenedFileIds = openedFileIds.filter(item => item !== data.id)
+      setOpenedFileIds(newOpenedFileIds)
+    }
   }
   const onSaveEdit = (id, data) => {
-    console.log(id, data, 'save');
+    const newFile = handleUpdate(id, data, 'name')
+    setFiles(newFile)
   }
 
+  // tabList 
   const onTabClick = data => {
     setActiveFileId(data.id)
   }
@@ -44,13 +74,9 @@ function App() {
     setActiveFileId(openedFileIds[0])
   }, [openedFileIds])
 
+  // editor 
   const changeEditor = data => {
-    const newFile = files.map(item => {
-      if (item.id === activeFileId) {
-        item.body = data
-      }
-      return item
-    })
+    const newFile = handleUpdate(activeFileId, data, 'body')
     setFiles(newFile)
     if (unSavedIds.includes(activeFileId)) return
     setUnSavedIds([...unSavedIds, activeFileId])
@@ -59,9 +85,9 @@ function App() {
     <div className="App container-fluid px-0">
       <div className='row g-0'>
         <div className='col-3'>
-          <FileSearch onFileSearch={(val) => console.log(val)} />
+          <FileSearch onFileSearch={onFileSearch} onCloseInput={onCloseInput} />
           <FileList
-            files={files}
+            files={searchFiles.length ? searchFiles : files}
             activeId={activeFileId}
             onFileClick={onFileClick}
             onFileDelete={onFileDelete}
