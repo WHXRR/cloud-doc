@@ -8,6 +8,7 @@ import TabList from './components/tabList/TabList';
 import Editor from './components/editor/Editor';
 import defaultFiles from './utils/files'
 import { useEffect, useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 
 function App() {
 
@@ -16,10 +17,12 @@ function App() {
   const [openedFileIds, setOpenedFileIds] = useState([])
   const [unSavedIds, setUnSavedIds] = useState([])
 
-  const handleUpdate = (id, content, target) => {
+  const handleUpdate = (id, ...arg) => {
     return files.map(file => {
       if (file.id === id) {
-        file[target] = content
+        arg.forEach(item => {
+          file[item.key] = item.value
+        })
       }
       return file
     })
@@ -55,7 +58,7 @@ function App() {
     }
   }
   const onSaveEdit = (id, data) => {
-    const newFile = handleUpdate(id, data, 'name')
+    const newFile = handleUpdate(id, { key: 'name', value: data }, { key: 'isNew', value: false })
     setFiles(newFile)
   }
 
@@ -76,11 +79,28 @@ function App() {
 
   // editor 
   const changeEditor = data => {
-    const newFile = handleUpdate(activeFileId, data, 'body')
+    const newFile = handleUpdate(activeFileId, { key: 'body', value: data })
     setFiles(newFile)
     if (unSavedIds.includes(activeFileId)) return
     setUnSavedIds([...unSavedIds, activeFileId])
   }
+
+  // bottombtn 
+  const onAddFile = () => {
+    const id = uuidv4()
+    const newFiles = [
+      ...files,
+      {
+        id,
+        name: '',
+        body: '',
+        createdAt: new Date().getTime(),
+        isNew: true
+      }
+    ]
+    setFiles(newFiles)
+  }
+  const onImportFile = () => { }
   return (
     <div className="App container-fluid px-0">
       <div className='row g-0'>
@@ -92,7 +112,7 @@ function App() {
             onFileClick={onFileClick}
             onFileDelete={onFileDelete}
             onSaveEdit={onSaveEdit} />
-          <BottomBtn />
+          <BottomBtn onAddFile={onAddFile} onImportFile={onImportFile} />
         </div>
         <div className='col-9 right-container'>
           <TabList
