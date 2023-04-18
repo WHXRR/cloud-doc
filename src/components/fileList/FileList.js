@@ -26,7 +26,7 @@ const FileList = ({ files, onFileClick, onSaveEdit, onFileDelete, activeId }) =>
     if (data.isNew && !value) {
       onFileDelete(data)
     } else {
-      onSaveEdit(data.id, value)
+      onSaveEdit(data.id, value, data.isNew)
     }
     setIsEdit('')
   }

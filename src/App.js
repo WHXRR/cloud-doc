@@ -10,15 +10,20 @@ import defaultFiles from './utils/files'
 import { useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { flattenArr, objToArr } from './utils/helper'
+import fileHelper from './utils/fileHelper';
+
+const { join } = window.require('path')
+const { app } = window.require('@electron/remote')
 
 function App() {
-
   const [files, setFiles] = useState(flattenArr(defaultFiles))
   const filesArr = objToArr(files)
 
   const [activeFileId, setActiveFileId] = useState(0)
   const [openedFileIds, setOpenedFileIds] = useState([])
   const [unSavedIds, setUnSavedIds] = useState([])
+  // 存储路径
+  const saveLocation = app.getPath('documents')
 
   // search 
   const [searchFiles, setSearchFiles] = useState([])
@@ -49,13 +54,21 @@ function App() {
       setOpenedFileIds(newOpenedFileIds)
     }
   }
-  const onSaveEdit = (id, data) => {
+  const onSaveEdit = (id, data, isNew) => {
     const newFile = {
       ...files[id],
       name: data,
       isNew: false
     }
-    setFiles({ ...files, [id]: newFile })
+    if (isNew) {
+      fileHelper.writeFile(join(saveLocation, `${data}.md`), files[id].body).then(() => {
+        setFiles({ ...files, [id]: newFile })
+      })
+    } else {
+      fileHelper.renameFile(join(saveLocation, `${files[id].name}.md`), join(saveLocation, `${data}.md`)).then(() => {
+        setFiles({ ...files, [id]: newFile })
+      })
+    }
   }
 
   // tabList 
@@ -97,6 +110,12 @@ function App() {
     setFiles({ ...files, [id]: newFile })
   }
   const onImportFile = () => { }
+  const handleSave = () => {
+    fileHelper.writeFile(join(saveLocation, `${activeFile.name}.md`), activeFile.body).then(() => {
+      const newUnSavedIds = unSavedIds.filter(id => id !== activeFileId)
+      setUnSavedIds(newUnSavedIds)
+    })
+  }
   return (
     <div className="App container-fluid px-0">
       <div className='row g-0'>
@@ -119,6 +138,7 @@ function App() {
             onCloseTab={onCloseTab}
           />
           <Editor value={activeFile?.body} changeEditor={changeEditor} />
+          <button onClick={handleSave}>save</button>
         </div>
       </div>
     </div>

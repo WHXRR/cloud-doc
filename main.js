@@ -7,9 +7,13 @@ app.on('ready', () => {
     width: 1200,
     height: 800,
     webPreferences: {
-      nodeIntegration: true
+      contextIsolation: false,
+      nodeIntegration: true,
+      nodeIntegrationInWorker: true
     }
   })
   const url = isDev ? 'http://localhost:3000' : '*'
   mainWindow.loadURL(url)
+  require('@electron/remote/main').initialize()
+  require('@electron/remote/main').enable(mainWindow.webContents)
 })
