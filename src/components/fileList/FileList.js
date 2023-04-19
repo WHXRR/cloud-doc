@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { message } from 'antd';
 import PropTypes from 'prop-types'
 import useKeyPress from '../../hooks/useKeyPress'
 import classNames from 'classnames'
@@ -6,6 +7,7 @@ import './FileList.scss'
 
 const FileList = ({ files, onFileClick, onSaveEdit, onFileDelete, activeId }) => {
 
+  const [messageApi, contextHolder] = message.useMessage();
   const [isEdit, setIsEdit] = useState('')
   const [value, setValue] = useState('')
   const handleEdit = (e, data) => {
@@ -23,6 +25,7 @@ const FileList = ({ files, onFileClick, onSaveEdit, onFileDelete, activeId }) =>
     e.stopPropagation();
   }
   const saveFile = (data) => {
+    if (files.filter(file => (file.name === value) && (file.id !== isEdit)).length) return messageApi.warning('有重复的名称!');
     if (data.isNew && !value) {
       onFileDelete(data)
     } else {
@@ -30,21 +33,9 @@ const FileList = ({ files, onFileClick, onSaveEdit, onFileDelete, activeId }) =>
     }
     setIsEdit('')
   }
-  const handleSubmit = (e, data) => {
-    e.stopPropagation();
-    saveFile(data)
-  }
   // 输入框失焦事件，加定时器防止与submit事件冲突
-  const handleCancel = () => {
-    const file = files.find(item => item.id === isEdit)
-    setTimeout(() => {
-      if (isEdit) {
-        setIsEdit('')
-        if (file.isNew) {
-          onFileDelete(file)
-        }
-      }
-    }, 100);
+  const handleCancel = (data) => {
+    saveFile(data)
   }
   const handleDelete = (e, data) => {
     e.stopPropagation();
@@ -76,6 +67,7 @@ const FileList = ({ files, onFileClick, onSaveEdit, onFileDelete, activeId }) =>
   }, [files])
   return (
     <div className="file-list">
+      {contextHolder}
       <ul className="list-group list-group-flush">
         {
           files.map(file => {
@@ -105,7 +97,7 @@ const FileList = ({ files, onFileClick, onSaveEdit, onFileDelete, activeId }) =>
                           value={value}
                           onClick={e => handleInputClick(e)}
                           onChange={(e) => setValue(e.target.value)}
-                          onBlur={handleCancel} />
+                          onBlur={() => handleCancel(file)} />
                       </div>
                     ) : (
                       <div
@@ -118,29 +110,16 @@ const FileList = ({ files, onFileClick, onSaveEdit, onFileDelete, activeId }) =>
                   }
                   <div className="d-flex justify-content-between options-icon">
                     {
-                      file.id === isEdit ? (
-                        <svg
-                          onClick={(e) => handleSubmit(e, file)}
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="14"
-                          height="14"
-                          fill="currentColor"
-                          className="bi bi-check2"
-                          viewBox="0 0 16 16">
-                          <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z" />
-                        </svg>
-                      ) : (
-                        <svg
-                          onClick={(e) => handleEdit(e, file)}
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="14"
-                          height="14"
-                          fill="currentColor"
-                          className="bi bi-pen"
-                          viewBox="0 0 16 16">
-                          <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001zm-.644.766a.5.5 0 0 0-.707 0L1.95 11.756l-.764 3.057 3.057-.764L14.44 3.854a.5.5 0 0 0 0-.708l-1.585-1.585z" />
-                        </svg>
-                      )
+                      file.id !== isEdit && <svg
+                        onClick={(e) => handleEdit(e, file)}
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="14"
+                        height="14"
+                        fill="currentColor"
+                        className="bi bi-pen"
+                        viewBox="0 0 16 16">
+                        <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001zm-.644.766a.5.5 0 0 0-.707 0L1.95 11.756l-.764 3.057 3.057-.764L14.44 3.854a.5.5 0 0 0 0-.708l-1.585-1.585z" />
+                      </svg>
                     }
                     <svg
                       onClick={(e) => handleDelete(e, file)}

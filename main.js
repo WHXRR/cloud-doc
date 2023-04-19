@@ -1,5 +1,7 @@
 const { app, BrowserWindow } = require('electron')
 const isDev = require('electron-is-dev')
+const Store = require('electron-store');
+Store.initRenderer()
 
 let mainWindow
 app.on('ready', () => {
