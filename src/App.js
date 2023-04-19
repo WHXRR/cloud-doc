@@ -39,6 +39,7 @@ function App() {
   const [activeFileId, setActiveFileId] = useState(0)
   const [openedFileIds, setOpenedFileIds] = useState([])
   const [unSavedIds, setUnSavedIds] = useState([])
+  const [errorFileId, setErrorFileId] = useState(0)
 
   // search 
   const [searchFiles, setSearchFiles] = useState([])
@@ -65,6 +66,7 @@ function App() {
       }).catch(() => {
         // 手动删除本地文件后，会找不到文件导致报错
         setOpen(true);
+        setErrorFileId(data.id)
       })
     }
     setActiveFileId(data.id)
@@ -81,6 +83,9 @@ function App() {
         const { [data.id]: value, ...afterDelete } = files
         setFiles(afterDelete)
         saveFilesToStore(afterDelete)
+      }).catch(() => {
+        setOpen(true);
+        setErrorFileId(data.id)
       })
       // 如果打开的文件列表中有当前文件，则更新打开的文件列表
       if (openedFileIds.includes(data.id)) {
@@ -107,6 +112,9 @@ function App() {
       fileHelper.renameFile(join(saveLocation, `${files[id].name}.md`), newPath).then(() => {
         setFiles(newFiles)
         saveFilesToStore(newFiles)
+      }).catch(() => {
+        setOpen(true);
+        setErrorFileId(id)
       })
     }
   }
@@ -160,7 +168,7 @@ function App() {
   // dialog 
   const [open, setOpen] = useState(false);
   const handleOk = () => {
-    const { [activeFileId]: value, ...afterDelete } = files
+    const { [errorFileId]: value, ...afterDelete } = files
     setFiles(afterDelete)
     saveFilesToStore(afterDelete)
     setOpen(false);
