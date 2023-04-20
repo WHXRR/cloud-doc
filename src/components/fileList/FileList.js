@@ -3,10 +3,11 @@ import { message } from 'antd';
 import PropTypes from 'prop-types'
 import useKeyPress from '../../hooks/useKeyPress'
 import classNames from 'classnames'
+import useContextMenu from "../../hooks/useContextMenu";
+import { getTargetNode } from "../../utils/helper"
 import './FileList.scss'
 
 const FileList = ({ files, onFileClick, onSaveEdit, onFileDelete, activeId }) => {
-
   const [messageApi, contextHolder] = message.useMessage();
   const [isEdit, setIsEdit] = useState('')
   const [value, setValue] = useState('')
@@ -65,6 +66,37 @@ const FileList = ({ files, onFileClick, onSaveEdit, onFileDelete, activeId }) =>
       setValue(newFile.name)
     }
   }, [files])
+
+  const clickedMenu = useContextMenu([
+    {
+      label: '打开',
+      click: () => {
+        const targetEle = getTargetNode(clickedMenu.current, 'file-item')
+        if (!targetEle) return
+        const file = JSON.parse(targetEle.dataset.file)
+        onFileClick(file)
+      }
+    },
+    {
+      label: '删除',
+      click: () => {
+        const targetEle = getTargetNode(clickedMenu.current, 'file-item')
+        if (!targetEle) return
+        const file = JSON.parse(targetEle.dataset.file)
+        onFileDelete(file)
+      }
+    },
+    {
+      label: '重命名',
+      click: () => {
+        const targetEle = getTargetNode(clickedMenu.current, 'file-item')
+        if (!targetEle) return
+        const file = JSON.parse(targetEle.dataset.file)
+        setIsEdit(file.id)
+        setValue(file.name)
+      }
+    }
+  ], '.list-group', [files])
   return (
     <div className="file-list">
       {contextHolder}
@@ -80,6 +112,7 @@ const FileList = ({ files, onFileClick, onSaveEdit, onFileDelete, activeId }) =>
               <li
                 className={className}
                 key={file.id}
+                data-file={JSON.stringify(file)}
                 onClick={() => onFileClick(file)}
               >
                 <div className="d-flex align-items-center">
