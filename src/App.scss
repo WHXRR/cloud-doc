@@ -12,6 +12,10 @@ html {
 .right-container {
   display: flex;
   flex-direction: column;
+  height: 100vh;
+}
+#simplemde-editor-2-wrapper {
+  overflow-y: auto;
 }
 ::-webkit-scrollbar {
   width: 6px;
