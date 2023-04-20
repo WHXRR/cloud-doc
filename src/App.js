@@ -12,7 +12,7 @@ import { flattenArr, objToArr } from './utils/helper'
 import fileHelper from './utils/fileHelper';
 import { Modal } from 'antd';
 
-const { join, basename } = window.require('path')
+const { join, basename, extname } = window.require('path')
 const { app, dialog } = window.require('@electron/remote')
 
 // 存储路径
@@ -171,14 +171,15 @@ function App() {
       if (!res.canceled) {
         const newFiles = res.filePaths.map(path => {
           // 获取导入的文件的信息
-          let fileName = basename(path)
+          let fileNameSuffix = extname(path)
+          let fileName = basename(path, fileNameSuffix)
           // 相同名字的在文件名后面加索引
           const sameFileNameArr = filesArr.filter(file => file.name === fileName)
           if (sameFileNameArr.length) {
-            fileName = `${fileName.split('.md')[0]}(${sameFileNameArr.length}).md`
+            fileName = `${fileName}(${sameFileNameArr.length})`
           }
           const id = uuidv4()
-          const newPath = join(saveLocation, fileName)
+          const newPath = join(saveLocation, `${fileName}.md`)
           fileHelper.readFile(path).then((fileBody) => {
             fileHelper.writeFile(newPath, fileBody)
           })
