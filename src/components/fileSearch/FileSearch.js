@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import PropTypes from 'prop-types'
 import useKeyPress from '../../hooks/useKeyPress'
+import useIpcRenderer from '../../hooks/useIpcRenderer'
 import './FileSearch.scss'
 
 const FileSearch = ({ title, onFileSearch, onCloseInput }) => {
@@ -37,6 +38,10 @@ const FileSearch = ({ title, onFileSearch, onCloseInput }) => {
       closeInput()
     }
   }, [inputActive, isEnterPress, isEscPress])
+
+  useIpcRenderer({
+    'search-file': () => setInputAction(true),
+  }, [])
 
   return (
     <div className="alert title-h d-flex align-items-center pointer mb-0 rounded-0">

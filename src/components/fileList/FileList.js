@@ -67,6 +67,7 @@ const FileList = ({ files, onFileClick, onSaveEdit, onFileDelete, activeId }) =>
     }
   }, [files])
 
+  // 添加上下文菜单
   const clickedMenu = useContextMenu([
     {
       label: '打开',

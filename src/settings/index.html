@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link
+      rel="stylesheet"
+      href="../../node_modules/bootstrap/dist/css/bootstrap.min.css"
+    />
+    <style>
+      html {
+        font-size: 13px;
+      }
+      .settings {
+        padding: 20px;
+      }
+      .form-control:focus {
+        border-color: #212529 !important;
+        box-shadow: 0 0 0 0.25rem rgba(0, 0, 0, 0.25) !important;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="settings">
+      <p>选择文件的存储位置</p>
+      <div class="input-group mb-3">
+        <input
+          type="text"
+          disabled
+          class="form-control save-location-ipt"
+          placeholder="当前存储位置"
+          aria-label="当前存储位置"
+          aria-describedby="inputGroup-sizing-sm"
+        />
+        <button class="btn btn-outline-dark" id="selected-btn">选择新的位置</button>
+      </div>
+      <button id="submit" class="btn btn-dark" style="float: right">保存</button>
+    </div>
+    <script>
+      require('./index.js')
+    </script>
+  </body>
+</html>

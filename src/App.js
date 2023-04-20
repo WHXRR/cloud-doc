@@ -6,19 +6,21 @@ import FileList from './components/fileList/FileList';
 import BottomBtn from './components/bottomBtn/BottomBtn';
 import TabList from './components/tabList/TabList';
 import Editor from './components/editor/Editor';
+import useIpcRenderer from './hooks/useIpcRenderer'
+import fileHelper from './utils/fileHelper';
 import { useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { flattenArr, objToArr } from './utils/helper'
-import fileHelper from './utils/fileHelper';
 import { Modal } from 'antd';
 
 const { join, basename, extname } = window.require('path')
 const { app, dialog } = window.require('@electron/remote')
 
 // 存储路径
-const saveLocation = app.getPath('documents')
 const Store = window.require('electron-store');
 const fileStore = new Store({ 'name': 'Files Data' });
+const settingsStore = new Store({ 'name': 'Settings' });
+const saveLocation = settingsStore.get('saveFileLocation') || app.getPath('documents')
 const saveFilesToStore = (files) => {
   const filesObj = objToArr(files).reduce((pre, cur) => {
     pre[cur.id] = {
@@ -236,6 +238,11 @@ function App() {
     })
   }
 
+  useIpcRenderer({
+    'save-file': handleSave,
+    'create-new-file': onAddFile,
+    'import-file': onImportFile,
+  }, [activeFile])
   return (
     <div className="App container-fluid px-0">
       <div className='row g-0'>
@@ -258,7 +265,6 @@ function App() {
             onCloseTab={onCloseTab}
           />
           <Editor value={activeFile?.body} changeEditor={changeEditor} />
-          <button onClick={handleSave}>save</button>
         </div>
       </div>
       <>
