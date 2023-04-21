@@ -20,6 +20,7 @@ app.on('ready', () => {
       width: 500,
       height: 250,
       show: false,
+      autoHideMenuBar: true,
       parent: mainWindow
     }, settingsURL)
     settingsWindow.on('close', () => {
