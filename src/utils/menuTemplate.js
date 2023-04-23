@@ -20,6 +20,13 @@ const menuTemplate = [
         }
       },
       {
+        label: '关闭',
+        accelerator: 'CmdOrCtrl+W',
+        click: (menuItem, browserWindow, e) => {
+          browserWindow.webContents.send('close-file')
+        }
+      },
+      {
         label: '搜索',
         accelerator: 'CmdOrCtrl+F',
         click: (menuItem, browserWindow, e) => {
@@ -127,12 +134,7 @@ const menuTemplate = [
         label: '最小化',
         accelerator: 'CmdOrCtrl+M',
         role: 'minimize'
-      },
-      {
-        label: '关闭',
-        accelerator: 'CmdOrCtrl+W',
-        role: 'close'
-      },
+      }
     ]
   },
   {

@@ -14,6 +14,13 @@ html {
   flex-direction: column;
   height: 100vh;
 }
+.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  background-color: #f8f9fa;
+}
 #simplemde-editor-2-wrapper {
   overflow-y: auto;
 }

@@ -8,7 +8,7 @@ import TabList from './components/tabList/TabList';
 import Editor from './components/editor/Editor';
 import useIpcRenderer from './hooks/useIpcRenderer'
 import fileHelper from './utils/fileHelper';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { flattenArr, objToArr } from './utils/helper'
 import { Modal } from 'antd';
@@ -42,6 +42,8 @@ function App() {
   const [openedFileIds, setOpenedFileIds] = useState([])
   const [unSavedIds, setUnSavedIds] = useState([])
   const [errorFileId, setErrorFileId] = useState(0)
+  // dialog中获取不到useState更新后的最新值，需用useRef跟useEffect来获取最新值
+  const errorFileIdRef = useRef(errorFileId)
 
   // search 
   const [searchFiles, setSearchFiles] = useState([])
@@ -67,9 +69,9 @@ function App() {
         setFiles({ ...files, [data.id]: newFile })
       }).catch(() => {
         // 手动删除本地文件后，会找不到文件导致报错
-        setOpen(true);
+        // setOpen(true);
         setErrorFileId(data.id)
-        // handleErrorFile()
+        handleErrorFile()
       })
     }
     setActiveFileId(data.id)
@@ -87,9 +89,9 @@ function App() {
         setFiles(afterDelete)
         saveFilesToStore(afterDelete)
       }).catch(() => {
-        setOpen(true);
+        // setOpen(true);
         setErrorFileId(data.id)
-        // handleErrorFile()
+        handleErrorFile()
       })
       // 如果打开的文件列表中有当前文件，则更新打开的文件列表
       if (openedFileIds.includes(data.id)) {
@@ -117,9 +119,9 @@ function App() {
         setFiles(newFiles)
         saveFilesToStore(newFiles)
       }).catch(() => {
-        setOpen(true);
+        // setOpen(true);
         setErrorFileId(id)
-        // handleErrorFile()
+        handleErrorFile()
       })
     }
   }
@@ -131,6 +133,7 @@ function App() {
   const onCloseTab = data => {
     const arr = [...openedFileIds]
     const index = arr.indexOf(data.id)
+    if (index === -1) return
     arr.splice(index, 1)
     setOpenedFileIds([...arr])
   }
@@ -231,17 +234,21 @@ function App() {
       buttons: ['取消', '确认']
     }).then(result => {
       if (!result.response) return
-      const { [errorFileId]: value, ...afterDelete } = files
+      const { [errorFileIdRef.current]: value, ...afterDelete } = files
       setFiles(afterDelete)
       saveFilesToStore(afterDelete)
       setOpen(false);
     })
   }
+  useEffect(() => {
+    errorFileIdRef.current = errorFileId
+  }, [errorFileId])
 
   useIpcRenderer({
     'save-file': handleSave,
     'create-new-file': onAddFile,
     'import-file': onImportFile,
+    'close-file': () => onCloseTab({ id: activeFileId }),
   }, [activeFile])
   return (
     <div className="App container-fluid px-0">
@@ -264,7 +271,15 @@ function App() {
             onTabClick={onTabClick}
             onCloseTab={onCloseTab}
           />
-          <Editor value={activeFile?.body} changeEditor={changeEditor} />
+          {
+            activeFileId ? <Editor value={activeFile?.body} changeEditor={changeEditor} /> : (
+              <div className='empty'>
+                <svg xmlns="http://www.w3.org/2000/svg" width="150" height="150" fill="currentColor" className="bi bi-cloudy" viewBox="0 0 16 16">
+                  <path d="M13.405 8.527a5.001 5.001 0 0 0-9.499-1.004A3.5 3.5 0 1 0 3.5 14.5H13a3 3 0 0 0 .405-5.973zM8.5 5.5a4 4 0 0 1 3.976 3.555.5.5 0 0 0 .5.445H13a2 2 0 0 1-.001 4H3.5a2.5 2.5 0 1 1 .605-4.926.5.5 0 0 0 .596-.329A4.002 4.002 0 0 1 8.5 5.5z" />
+                </svg>
+              </div>
+            )
+          }
         </div>
       </div>
       <>
