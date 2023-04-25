@@ -11,7 +11,7 @@ const useIpcRenderer = (ipcObj, deps) => {
         ipcRenderer.removeListener(key, ipcObj[key])
       })
     }
-  }, deps)
+  })
 }
 
 export default useIpcRenderer

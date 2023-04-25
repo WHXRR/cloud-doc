@@ -24,6 +24,16 @@ html {
 #simplemde-editor-2-wrapper {
   overflow-y: auto;
 }
+.cloud {
+  left: 0;
+  bottom: 0;
+  padding: 8px;
+  padding-right: 15px;
+  color: #959694;
+  text-align: right;
+  font-size: 12px;
+  background-color: #f8f9fa;
+}
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;

@@ -19,3 +19,8 @@ export const getTargetNode = (currentNode, targetClassName) => {
   }
   return false
 }
+
+export const timeStampToString = (timestamp) => {
+  const date = new Date(timestamp)
+  return date.toLocaleDateString() + ' ' + date.toLocaleTimeString()
+}

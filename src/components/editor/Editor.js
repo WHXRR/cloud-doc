@@ -8,7 +8,6 @@ const Editor = ({ value, changeEditor }) => {
     return {
       autofocus: true,
       spellChecker: false,
-      minHeight: 'calc(100vh - 140px)'
     };
   }, []);
 

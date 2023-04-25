@@ -41,7 +41,7 @@ const FileSearch = ({ title, onFileSearch, onCloseInput }) => {
 
   useIpcRenderer({
     'search-file': () => setInputAction(true),
-  }, [])
+  })
 
   return (
     <div className="alert title-h d-flex align-items-center pointer mb-0 rounded-0">

@@ -1,4 +1,6 @@
 const qiniu = require('qiniu')
+const axios = require('axios')
+const fs = require('fs')
 
 class QiniuManager {
   constructor(accessKey, secretKey, bucket) {
@@ -24,13 +26,40 @@ class QiniuManager {
       formUploader.putFile(uploadToken, key, localFilePath, putExtra, this._handleCallback(resolve, reject));
     })
   }
-  downLoadFile(publicBucketDomain, key) {
-    const publicDownloadUrl = this.bucketManager.publicDownloadUrl(publicBucketDomain, key);
-    return publicDownloadUrl
+  downLoadFile(key, path) {
+    return this.generateFileDownloadLink(key).then(link => {
+      const timeStamp = new Date().getTime()
+      const url = `${link}?timeStamp=${timeStamp}`
+      return axios({
+        url,
+        method: 'GET',
+        responseType: 'stream',
+        headers: {
+          'Cache-control': 'no-cache'
+        }
+      }).then(res => {
+        const writer = fs.createWriteStream(path)
+        res.data.pipe(writer)
+        return new Promise((resolve, reject) => {
+          writer.on('finish', resolve())
+          writer.on('error', reject())
+        })
+      }).catch(err => {
+        throw err
+      })
+    })
   }
   deleteFile(key) {
     return new Promise((resolve, reject) => {
       this.bucketManager.delete(this.bucket, key, this._handleCallback(resolve, reject));
+    })
+  }
+  renameFile(key, destKey) {
+    const options = {
+      force: true
+    }
+    return new Promise((resolve, reject) => {
+      this.bucketManager.move(this.bucket, key, this.bucket, destKey, options, this._handleCallback(resolve, reject));
     })
   }
   getBucketDomain() {
@@ -50,6 +79,11 @@ class QiniuManager {
       } else {
         throw Error('error')
       }
+    })
+  }
+  getFile(key) {
+    return new Promise((resolve, reject) => {
+      this.bucketManager.stat(this.bucket, key, this._handleCallback(resolve, reject))
     })
   }
   _handleCallback(resolve, reject) {

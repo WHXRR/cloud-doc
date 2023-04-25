@@ -1,4 +1,10 @@
 const { app, shell, ipcMain } = require('electron')
+const Store = require('electron-store')
+const settingsStore = new Store({ 'name': 'Settings' });
+
+const ids = ['access-key', 'secret-key', 'bucket-name']
+const canCloud = ids.every(id => !!settingsStore.get(id))
+let enableAutoSync = settingsStore.get('enableAutoSync') || false
 
 const menuTemplate = [
   {
@@ -49,6 +55,32 @@ const menuTemplate = [
         click: () => {
           ipcMain.emit('open-settings-window')
         }
+      },
+    ]
+  },
+  {
+    label: '云同步',
+    submenu: [
+      {
+        label: '自动同步',
+        type: 'checkbox',
+        enabled: canCloud,
+        checked: enableAutoSync,
+        click: () => {
+          settingsStore.set('enableAutoSync', !enableAutoSync)
+        }
+      },
+      {
+        label: '全部同步到云端',
+        enabled: canCloud,
+        click: () => {
+          ipcMain.emit('upload-all-to-cloud')
+        }
+      },
+      {
+        label: '从云端下载到本地',
+        enabled: canCloud,
+        click: () => { }
       },
     ]
   },
