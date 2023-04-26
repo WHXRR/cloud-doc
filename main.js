@@ -23,7 +23,7 @@ const saveLocation = settingsStore.get('saveFileLocation') || app.getPath('docum
 
 let mainWindow
 app.on('ready', () => {
-  const url = isDev ? 'http://localhost:3000' : '*'
+  const url = isDev ? 'http://localhost:3000' : `file://${join(__dirname, './build/index.html')}`
   mainWindow = new AppWindow({}, url)
   mainWindow.on('close', () => {
     mainWindow = null
@@ -123,6 +123,7 @@ app.on('ready', () => {
       mainWindow.webContents.send('loading', false)
     })
   })
+  // 从云端下载所有文件
   ipcMain.on('download-all-from-cloud', () => {
     const manager = createManager()
     mainWindow.webContents.send('loading', true)
@@ -161,11 +162,11 @@ app.on('ready', () => {
         mainWindow.webContents.send('download-all-cloud-files-result', filterCloudFiles)
       }).catch(err => {
         dialog.showErrorBox('从云端获取失败', err.body?.error || '请检查七牛云配置是否正确')
+      }).finally(() => {
+        mainWindow.webContents.send('loading', false)
       })
     }).catch(err => {
       dialog.showErrorBox('从云端获取失败', err.body?.error || '请检查七牛云配置是否正确')
-    }).finally(() => {
-      mainWindow.webContents.send('loading', false)
     })
   })
 })

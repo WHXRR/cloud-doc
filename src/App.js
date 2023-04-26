@@ -11,7 +11,7 @@ import useIpcRenderer from './hooks/useIpcRenderer'
 import fileHelper from './utils/fileHelper';
 import { useEffect, useRef, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { flattenArr, objToArr, timeStampToString } from './utils/helper'
+import { flattenArr, objToArr, timeStampToString, isOnLine } from './utils/helper'
 
 const { join, basename, extname } = window.require('path')
 const { app, dialog } = window.require('@electron/remote')
@@ -101,7 +101,7 @@ function App() {
         setFiles(afterDelete)
         saveFilesToStore(afterDelete)
         // 如果有云同步，则需把云端的也删除
-        if (data.isSync) {
+        if (data.isSync && isOnLine) {
           ipcRenderer.send('delete-cloud-file', `${data.name}.md`)
         }
       }).catch(() => {
@@ -134,7 +134,7 @@ function App() {
       fileHelper.renameFile(join(saveLocation, `${files[id].name}.md`), newPath).then(() => {
         setFiles(newFiles)
         saveFilesToStore(newFiles)
-        if (oldFile.isSync) {
+        if (oldFile.isSync && isOnLine) {
           ipcRenderer.send('rename-cloud-file', {
             key: `${oldFile.name}.md`,
             destKey: `${data}.md`

@@ -25,9 +25,12 @@ const timeStampToString = (timestamp) => {
   return date.toLocaleDateString() + ' ' + date.toLocaleTimeString()
 }
 
+const isOnLine = () => window.navigator.onLine
+
 export {
   flattenArr,
   objToArr,
   getTargetNode,
-  timeStampToString
+  timeStampToString,
+  isOnLine
 }

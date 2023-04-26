@@ -1,6 +1,11 @@
 {
   "name": "cloud-doc",
   "version": "0.1.0",
+  "description": "test cloud doc",
+  "author": {
+    "name": "whxrr"
+  },
+  "repository": "https://github.com/WHXRR/cloud-doc",
   "private": true,
   "dependencies": {
     "@electron/remote": "^2.0.9",
@@ -15,7 +20,6 @@
     "concurrently": "^8.0.1",
     "cross-env": "^7.0.3",
     "easymde": "^2.18.0",
-    "electron": "^24.0.0",
     "electron-is-dev": "^2.0.0",
     "electron-store": "^8.1.0",
     "qiniu": "^7.8.0",
@@ -35,7 +39,67 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "dev": "concurrently \"wait-on http://localhost:3000 && electron .\" \"cross-env BROWSER=none npm start\"",
-    "dev-ele": "nodemon --watch main.js --watch src/utils/menuTemplate.js --exec \"electron .\""
+    "dev-ele": "nodemon --watch main.js --watch src/utils/menuTemplate.js --exec \"electron .\"",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder",
+    "prepack": "npm run build",
+    "predist": "npm run build"
+  },
+  "homepage": "./",
+  "build": {
+    "appId": "CloudDoc",
+    "productName": "云文档",
+    "copyright": "Copyright © 2023 ${author}",
+    "extends": null,
+    "files": [
+      "build/**/*",
+      "node_modules/**/*",
+      "package.json",
+      "main.js",
+      "./src/settings/**/*",
+      "./src/utils/menuTemplate.js",
+      "./src/utils/qiniuManager.js",
+      "./src/utils/helperCommonjs.js",
+      "./src/AppWindow.js"
+    ],
+    "directories": {
+      "buildResources": "assets"
+    },
+    "mac": {
+      "category": "public.app-category.productivity",
+      "artifactName": "${productName}-${version}.${ext}"
+    },
+    "dmg": {
+      "icon": "assets/icon.png",
+      "iconSize": 100,
+      "contents": [
+        {
+          "x": 380,
+          "y": 280,
+          "type": "link",
+          "path": "/Applications"
+        },
+        {
+          "x": 110,
+          "y": 280,
+          "type": "file"
+        }
+      ],
+      "window": {
+        "width": 500,
+        "height": 500
+      }
+    },
+    "win": {
+      "target": ["msi", "nsis"],
+      "icon": "assets/icon.png",
+      "artifactName": "${productName}-${version}.${ext}"
+    },
+    "nsis": {
+      "allowToChangeInstallationDirectory": true,
+      "oneClick": false,
+      "perMachine": false
+    }
   },
   "eslintConfig": {
     "extends": [
@@ -54,5 +118,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "electron": "^24.1.2",
+    "electron-builder": "^23.6.0"
   }
 }
