@@ -62,6 +62,14 @@ class QiniuManager {
       this.bucketManager.move(this.bucket, key, this.bucket, destKey, options, this._handleCallback(resolve, reject));
     })
   }
+  getFileList() {
+    var options = {
+      limit: 100,
+    }
+    return new Promise((resolve, reject) => {
+      this.bucketManager.listPrefix(this.bucket, options, this._handleCallback(resolve, reject))
+    })
+  }
   getBucketDomain() {
     const reqURL = `http://api.qiniu.com/v6/domain/list?tbl=${this.bucket}`
     const token = qiniu.util.generateAccessToken(this.mac, reqURL)

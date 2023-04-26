@@ -1,10 +1,11 @@
 const { app, Menu, ipcMain, dialog } = require('electron')
-const { join } = require('path')
+const { join, basename } = require('path')
 const isDev = require('electron-is-dev')
 const Store = require('electron-store')
 const menuTemplate = require('./src/utils/menuTemplate')
 const AppWindow = require('./src/AppWindow')
 const Qiniu = require('./src/utils/qiniuManager')
+const { flattenArr, objToArr } = require('./src/utils/helperCommonjs')
 
 Store.initRenderer()
 const fileStore = new Store({ 'name': 'Files Data' });
@@ -15,6 +16,10 @@ const createManager = () => {
   const bucket = settingsStore.get('bucket-name')
   return new Qiniu(accessKey, secretKey, bucket)
 }
+
+const formatPutTime = (putTime) => Math.round(putTime / 10000)
+const fileName = (name) => basename(name, '.md')
+const saveLocation = settingsStore.get('saveFileLocation') || app.getPath('documents')
 
 let mainWindow
 app.on('ready', () => {
@@ -104,9 +109,7 @@ app.on('ready', () => {
   ipcMain.on('delete-cloud-file', (e, key) => {
     mainWindow.webContents.send('loading', true)
     createManager().deleteFile(key).catch((err) => {
-      if (err.statusCode === 612) {
-        dialog.showErrorBox('删除云端文件失败', err.body?.error || '请检查七牛云配置是否正确')
-      }
+      dialog.showErrorBox('删除云端文件失败', err.body?.error || '请检查七牛云配置是否正确')
     }).finally(() => {
       mainWindow.webContents.send('loading', false)
     })
@@ -115,9 +118,52 @@ app.on('ready', () => {
   ipcMain.on('rename-cloud-file', (e, { key, destKey }) => {
     mainWindow.webContents.send('loading', true)
     createManager().renameFile(key, destKey).catch((err) => {
-      if (err.code === 612) {
-        dialog.showErrorBox('同步云端文件失败', err.body?.error || '请检查七牛云配置是否正确')
-      }
+      dialog.showErrorBox('同步云端文件失败', err.body?.error || '请检查七牛云配置是否正确')
+    }).finally(() => {
+      mainWindow.webContents.send('loading', false)
+    })
+  })
+  ipcMain.on('download-all-from-cloud', () => {
+    const manager = createManager()
+    mainWindow.webContents.send('loading', true)
+    manager.getFileList().then(res => {
+      // 获取本地store里的文件，并将其转为以name为key，其他属性为value的对象
+      const localFiles = fileStore.get('files') || {}
+      const localFilesArr = objToArr(localFiles)
+      const flattenLocalFiles = flattenArr(localFilesArr, 'name')
+      // 过滤云端文件，并输出下载文件的promise数组
+      const filterCloudFiles = res.items.filter(item => {
+        // 比较是否比本地文件新
+        const isNew = flattenLocalFiles[fileName(item.key)]?.updatedAt && (formatPutTime(item.putTime) > flattenLocalFiles[fileName(item.key)]?.updatedAt)
+        // 比较是否存在该本地文件
+        const isExist = flattenLocalFiles[fileName(item.key)]
+        if (!isExist) {
+          item.isExist = false
+        } else {
+          item.isExist = true
+          item.id = flattenLocalFiles[fileName(item.key)].id
+        }
+        return isNew || !isExist
+      })
+      const filterPromiseFiles = filterCloudFiles.map(item => {
+        if (flattenLocalFiles[fileName(item.key)]) {
+          return manager.downLoadFile(item.key, flattenLocalFiles[fileName(item.key)].path)
+        } else {
+          return manager.downLoadFile(item.key, join(saveLocation, item.key))
+        }
+      })
+      Promise.all(filterPromiseFiles).then(res => {
+        dialog.showMessageBox({
+          type: 'info',
+          title: `成功下载了${res.length}个文件`,
+          message: `成功下载了${res.length}个文件`
+        })
+        mainWindow.webContents.send('download-all-cloud-files-result', filterCloudFiles)
+      }).catch(err => {
+        dialog.showErrorBox('从云端获取失败', err.body?.error || '请检查七牛云配置是否正确')
+      })
+    }).catch(err => {
+      dialog.showErrorBox('从云端获取失败', err.body?.error || '请检查七牛云配置是否正确')
     }).finally(() => {
       mainWindow.webContents.send('loading', false)
     })

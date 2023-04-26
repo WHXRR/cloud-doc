@@ -1,15 +1,15 @@
-export const flattenArr = (arr) => {
+const flattenArr = (arr, key = 'id') => {
   return arr.reduce((pre, cur) => {
-    pre[cur.id] = cur
+    pre[cur[key]] = cur
     return pre
   }, {})
 }
 
-export const objToArr = (obj) => {
+const objToArr = (obj) => {
   return Object.keys(obj).map(key => obj[key])
 }
 
-export const getTargetNode = (currentNode, targetClassName) => {
+const getTargetNode = (currentNode, targetClassName) => {
   let current = currentNode
   while (current !== null) {
     if (current.classList.contains(targetClassName)) {
@@ -20,7 +20,14 @@ export const getTargetNode = (currentNode, targetClassName) => {
   return false
 }
 
-export const timeStampToString = (timestamp) => {
+const timeStampToString = (timestamp) => {
   const date = new Date(timestamp)
   return date.toLocaleDateString() + ' ' + date.toLocaleTimeString()
+}
+
+export {
+  flattenArr,
+  objToArr,
+  getTargetNode,
+  timeStampToString
 }

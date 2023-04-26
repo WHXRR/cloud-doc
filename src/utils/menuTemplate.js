@@ -80,7 +80,9 @@ const menuTemplate = [
       {
         label: '从云端下载到本地',
         enabled: canCloud,
-        click: () => { }
+        click: () => {
+          ipcMain.emit('download-all-from-cloud')
+        }
       },
     ]
   },

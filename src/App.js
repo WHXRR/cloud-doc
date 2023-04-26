@@ -228,10 +228,18 @@ function App() {
   const handleSave = () => {
     if (!activeFileId) return
     if (!unSavedIds.includes(activeFileId)) return
-    const { name, body } = activeFile
+    const { name, body, id } = activeFile
     fileHelper.writeFile(join(saveLocation, `${name}.md`), body).then(() => {
       const newUnSavedIds = unSavedIds.filter(id => id !== activeFileId)
       setUnSavedIds(newUnSavedIds)
+      // 更新updatedAt
+      const newFile = {
+        ...files[id],
+        updatedAt: new Date().getTime()
+      }
+      const newFiles = { ...files, [id]: newFile }
+      setFiles(newFiles)
+      saveFilesToStore(newFiles)
       if (getAutoSync()) {
         ipcRenderer.send('upload-file', {
           key: `${name}.md`,
@@ -295,6 +303,32 @@ function App() {
     saveFilesToStore(newFiles)
   }
 
+  const onDownLoadAllCloudFiles = (e, data) => {
+    const newFiles = { ...files }
+    data.forEach(file => {
+      if (!file.isExist) {
+        const id = uuidv4()
+        const newFile = {
+          id,
+          name: basename(file.key, '.md'),
+          path: join(saveLocation, file.key),
+          isSync: true,
+          createdAt: new Date().getTime(),
+          updatedAt: new Date().getTime()
+        }
+        newFiles[id] = newFile
+      } else {
+        const newFile = {
+          ...files[file.id],
+          updatedAt: new Date().getTime()
+        }
+        newFiles[file.id] = newFile
+      }
+    })
+    setFiles(newFiles)
+    saveFilesToStore(newFiles)
+  }
+
   useIpcRenderer({
     'save-file': handleSave,
     'create-new-file': onAddFile,
@@ -304,6 +338,7 @@ function App() {
     'cloud-download-file': activeFileDownLoad,
     'loading': (e, flag) => setLoading(flag),
     'all-files-uploaded': onAllFilesUploaded,
+    'download-all-cloud-files-result': onDownLoadAllCloudFiles,
   })
   return (
     <div className="App container-fluid px-0">
@@ -331,13 +366,13 @@ function App() {
               <>
                 <Editor value={activeFile?.body} changeEditor={changeEditor} />
                 {
-                  activeFile.isSync && (
+                  activeFile?.isSync && (
                     <div className='cloud'>
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-cloud-check-fill" viewBox="0 0 16 16">
                         <path d="M8 2a5.53 5.53 0 0 0-3.594 1.342c-.766.66-1.321 1.52-1.464 2.383C1.266 6.095 0 7.555 0 9.318 0 11.366 1.708 13 3.781 13h8.906C14.502 13 16 11.57 16 9.773c0-1.636-1.242-2.969-2.834-3.194C12.923 3.999 10.69 2 8 2zm2.354 4.854-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7 8.793l2.646-2.647a.5.5 0 0 1 .708.708z" />
                       </svg>
                       <span style={{ marginLeft: '5px' }}>云同步完成</span>
-                      <span style={{ marginLeft: '5px' }}>{timeStampToString(activeFile.updatedAt)}</span>
+                      <span style={{ marginLeft: '5px' }}>{timeStampToString(activeFile?.updatedAt)}</span>
                     </div>
                   )
                 }
