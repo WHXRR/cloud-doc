@@ -8,29 +8,9 @@
   "repository": "https://github.com/WHXRR/cloud-doc",
   "private": true,
   "dependencies": {
-    "@electron/remote": "^2.0.9",
-    "@testing-library/jest-dom": "^5.16.5",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^13.5.0",
-    "antd": "^5.4.1",
-    "axios": "^1.3.6",
     "bootstrap": "^5.2.3",
-    "bootstrap-icons": "^1.10.4",
-    "classnames": "^2.3.2",
-    "concurrently": "^8.0.1",
-    "cross-env": "^7.0.3",
-    "easymde": "^2.18.0",
-    "electron-is-dev": "^2.0.0",
     "electron-store": "^8.1.0",
-    "qiniu": "^7.8.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-scripts": "5.0.1",
-    "react-simplemde-editor": "^5.2.0",
-    "sass": "^1.62.0",
-    "uuid": "^9.0.0",
-    "wait-on": "^7.0.1",
-    "web-vitals": "^2.1.4"
+    "@electron/remote": "^2.0.9"
   },
   "main": "main.js",
   "scripts": {
@@ -38,12 +18,13 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
+    "build-main": "webpack",
     "dev": "concurrently \"wait-on http://localhost:3000 && electron .\" \"cross-env BROWSER=none npm start\"",
     "dev-ele": "nodemon --watch main.js --watch src/utils/menuTemplate.js --exec \"electron .\"",
     "pack": "electron-builder --dir",
     "dist": "electron-builder",
-    "prepack": "npm run build",
-    "predist": "npm run build"
+    "prepack": "npm run build && npm run build-main",
+    "predist": "npm run build && npm run build-main"
   },
   "homepage": "./",
   "build": {
@@ -54,16 +35,13 @@
     "files": [
       "build/**/*",
       "node_modules/**/*",
-      "package.json",
-      "main.js",
-      "./src/settings/**/*",
-      "./src/utils/menuTemplate.js",
-      "./src/utils/qiniuManager.js",
-      "./src/utils/helperCommonjs.js",
-      "./src/AppWindow.js"
+      "package.json"
     ],
     "directories": {
       "buildResources": "assets"
+    },
+    "extraMetadata": {
+      "main": "./build/main.js"
     },
     "mac": {
       "category": "public.app-category.productivity",
@@ -91,7 +69,10 @@
       }
     },
     "win": {
-      "target": ["msi", "nsis"],
+      "target": [
+        "msi",
+        "nsis"
+      ],
       "icon": "assets/icon.png",
       "artifactName": "${productName}-${version}.${ext}"
     },
@@ -120,7 +101,28 @@
     ]
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "antd": "^5.4.1",
+    "bootstrap-icons": "^1.10.4",
+    "classnames": "^2.3.2",
+    "concurrently": "^8.0.1",
+    "cross-env": "^7.0.3",
+    "easymde": "^2.18.0",
     "electron": "^24.1.2",
-    "electron-builder": "^23.6.0"
+    "electron-builder": "^23.6.0",
+    "axios": "^1.3.6",
+    "electron-is-dev": "^2.0.0",
+    "qiniu": "^7.8.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-scripts": "5.0.1",
+    "react-simplemde-editor": "^5.2.0",
+    "sass": "^1.62.0",
+    "uuid": "^9.0.0",
+    "wait-on": "^7.0.1",
+    "web-vitals": "^2.1.4",
+    "webpack-cli": "^5.0.2"
   }
 }

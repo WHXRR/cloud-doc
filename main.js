@@ -23,7 +23,7 @@ const saveLocation = settingsStore.get('saveFileLocation') || app.getPath('docum
 
 let mainWindow
 app.on('ready', () => {
-  const url = isDev ? 'http://localhost:3000' : `file://${join(__dirname, './build/index.html')}`
+  const url = isDev ? 'http://localhost:3000' : `file://${join(__dirname, './index.html')}`
   mainWindow = new AppWindow({}, url)
   mainWindow.on('close', () => {
     mainWindow = null
