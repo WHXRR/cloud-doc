@@ -7,7 +7,7 @@ const Editor = ({ value, changeEditor }) => {
   const autofocusNoSpellcheckerOptions = useMemo(() => {
     return {
       autofocus: true,
-      spellChecker: false,
+      spellChecker: false
     };
   }, []);
 
