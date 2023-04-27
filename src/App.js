@@ -101,7 +101,7 @@ function App() {
         setFiles(afterDelete)
         saveFilesToStore(afterDelete)
         // 如果有云同步，则需把云端的也删除
-        if (data.isSync && isOnLine) {
+        if (data.isSync && isOnLine && getAutoSync()) {
           ipcRenderer.send('delete-cloud-file', `${data.name}.md`)
         }
       }).catch(() => {
@@ -134,7 +134,7 @@ function App() {
       fileHelper.renameFile(join(saveLocation, `${files[id].name}.md`), newPath).then(() => {
         setFiles(newFiles)
         saveFilesToStore(newFiles)
-        if (oldFile.isSync && isOnLine) {
+        if (oldFile.isSync && isOnLine && getAutoSync()) {
           ipcRenderer.send('rename-cloud-file', {
             key: `${oldFile.name}.md`,
             destKey: `${data}.md`
