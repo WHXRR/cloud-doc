@@ -67,7 +67,8 @@ const menuTemplate = [
         enabled: canCloud,
         checked: enableAutoSync,
         click: () => {
-          settingsStore.set('enableAutoSync', !enableAutoSync)
+          enableAutoSync = !enableAutoSync
+          settingsStore.set('enableAutoSync', enableAutoSync)
         }
       },
       {
