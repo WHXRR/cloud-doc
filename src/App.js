@@ -24,14 +24,15 @@ const settingsStore = new Store({ 'name': 'Settings' });
 const saveLocation = settingsStore.get('saveFileLocation') || app.getPath('documents')
 const saveFilesToStore = (files) => {
   const filesObj = objToArr(files).reduce((pre, cur) => {
-    const { id, name, path, isSync, createdAt, updatedAt } = cur
+    const { id, name, path, isSync, createdAt, updatedAt, putTime } = cur
     pre[id] = {
       id,
       name,
       path,
       isSync,
       createdAt,
-      updatedAt
+      updatedAt,
+      putTime
     }
     return pre
   }, {})
@@ -240,6 +241,7 @@ function App() {
       const newFiles = { ...files, [id]: newFile }
       setFiles(newFiles)
       saveFilesToStore(newFiles)
+      console.log(getAutoSync());
       if (getAutoSync()) {
         ipcRenderer.send('upload-file', {
           key: `${name}.md`,
@@ -268,7 +270,7 @@ function App() {
   }, [errorFileId])
 
   const activeFileUpload = (e, flag) => {
-    const modifiedFile = { ...files[activeFileId], isSync: flag, updatedAt: new Date().getTime() }
+    const modifiedFile = { ...files[activeFileId], isSync: flag, updatedAt: new Date().getTime(), putTime: new Date().getTime() }
     const newFiles = { ...files, [activeFileId]: modifiedFile }
     setFiles(newFiles)
     saveFilesToStore(newFiles)
@@ -280,7 +282,7 @@ function App() {
     fileHelper.readFile(path).then(data => {
       let newFile = null
       if (status === 1) {
-        newFile = { ...files[id], body: data, isLoaded: true, isSync: true, updatedAt: new Date().getTime() }
+        newFile = { ...files[id], body: data, isLoaded: true, isSync: true, updatedAt: new Date().getTime(), putTime: new Date().getTime() }
       } else {
         newFile = { ...files[id], body: data, isLoaded: true }
       }
@@ -295,7 +297,8 @@ function App() {
       pre[id] = {
         ...cur,
         isSync: true,
-        updatedAt: new Date().getTime()
+        updatedAt: new Date().getTime(),
+        putTime: new Date().getTime()
       }
       return pre
     }, {})
@@ -314,13 +317,15 @@ function App() {
           path: join(saveLocation, file.key),
           isSync: true,
           createdAt: new Date().getTime(),
-          updatedAt: new Date().getTime()
+          updatedAt: new Date().getTime(),
+          putTime: new Date().getTime()
         }
         newFiles[id] = newFile
       } else {
         const newFile = {
           ...files[file.id],
-          updatedAt: new Date().getTime()
+          updatedAt: new Date().getTime(),
+          putTime: new Date().getTime()
         }
         newFiles[file.id] = newFile
       }
@@ -372,7 +377,7 @@ function App() {
                         <path d="M8 2a5.53 5.53 0 0 0-3.594 1.342c-.766.66-1.321 1.52-1.464 2.383C1.266 6.095 0 7.555 0 9.318 0 11.366 1.708 13 3.781 13h8.906C14.502 13 16 11.57 16 9.773c0-1.636-1.242-2.969-2.834-3.194C12.923 3.999 10.69 2 8 2zm2.354 4.854-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7 8.793l2.646-2.647a.5.5 0 0 1 .708.708z" />
                       </svg>
                       <span style={{ marginLeft: '5px' }}>云同步完成</span>
-                      <span style={{ marginLeft: '5px' }}>{timeStampToString(activeFile?.updatedAt)}</span>
+                      <span style={{ marginLeft: '5px' }}>{timeStampToString(activeFile?.putTime)}</span>
                     </div>
                   )
                 }
